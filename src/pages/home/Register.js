@@ -33,7 +33,7 @@ class Register extends Component {
     e.preventDefault();
     const { name, email, password } = this.state;
 
-    fetch("http://localhost:3001/register", {
+    fetch("https://stormy-lake-56704.herokuapp.com/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

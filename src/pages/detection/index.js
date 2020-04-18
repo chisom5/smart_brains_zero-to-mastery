@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { withMyContext, MyContext } from "../../context/context";
 import { Container, ContainerInner } from "../style";
+import {withRouter} from 'react-router-dom'
 import Particles from "react-particles-js";
 import Navigation from "../../components/navigation";
 import ImageInputLink from "../../components/imageInput";
@@ -28,7 +29,12 @@ class Detection extends Component {
 
   componentDidMount() {
     const user = JSON.parse(localStorage.getItem("ActiveUser-SB"));
-    this.setState({ storageUser: user });
+    if(Object.keys(user).length === 0){
+      this.props.history.push("/");
+    }else{
+      this.setState({ storageUser: user });
+    }
+
   }
   calculateFaceLocation = data => {
     const clarifai = data.outputs[0].data.regions[0].region_info.bounding_box;
@@ -54,8 +60,8 @@ class Detection extends Component {
   onPictureSubmit = () => {
     this.setState({ imageUrl: this.state.input });
     // use clarifai api for image recongition
-    fetch("http://localhost:3001/imageurl", {
-      method: "PUT",
+    fetch("https://stormy-lake-56704.herokuapp.com/imageurl", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
@@ -65,14 +71,15 @@ class Detection extends Component {
     })
       .then(response => response.json())
       .then(response => {
+        console.log(response)
         if (response) {
-          fetch("http://localhost:3001/image", {
+          fetch("https://stormy-lake-56704.herokuapp.com/image", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              id: this.props.myContextProps.user.id
+              id: this.state.storageUser.id
             })
           })
             .then(res => {
@@ -151,4 +158,4 @@ class Detection extends Component {
     );
   }
 }
-export default withMyContext(Detection);
+export default withRouter(withMyContext(Detection));
